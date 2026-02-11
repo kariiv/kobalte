@@ -57,7 +57,6 @@ export interface TabsTriggerRenderProps extends TabsTriggerCommonProps {
 	disabled: boolean;
 	"aria-selected": boolean;
 	"aria-disabled": boolean | undefined;
-	"aria-controls": string | undefined;
 	"data-key": string | undefined;
 	"data-orientation": Orientation;
 	"data-selected": string | undefined;
@@ -137,7 +136,6 @@ export function TabsTrigger<T extends ValidComponent = "button">(
 			disabled={isDisabled()}
 			aria-selected={selectableItem.isSelected()}
 			aria-disabled={isDisabled() || undefined}
-			aria-controls={selectableItem.isSelected() ? contentId() : undefined}
 			data-key={selectableItem.dataKey()}
 			data-orientation={context.orientation()}
 			data-selected={selectableItem.isSelected() ? "" : undefined}

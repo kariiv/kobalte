@@ -166,23 +166,13 @@ export function TabsRoot<T extends ValidComponent = "div">(
 		),
 	);
 
-	// associated value/trigger ids
-	const triggerIdsMap = new Map<string, string>();
-
-	// associated value/content ids
-	const contentIdsMap = new Map<string, string>();
-
 	const context: TabsContextValue = {
 		isDisabled: () => local.disabled ?? false,
 		orientation: () => local.orientation!,
 		activationMode: () => local.activationMode!,
-		triggerIdsMap: () => triggerIdsMap,
-		contentIdsMap: () => contentIdsMap,
 		listState: () => listState,
 		selectedTab,
 		setSelectedTab,
-		generateTriggerId: (value) => `${others.id!}-trigger-${value}`,
-		generateContentId: (value) => `${others.id!}-content-${value}`,
 	};
 
 	return (

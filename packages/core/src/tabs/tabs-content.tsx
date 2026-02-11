@@ -7,21 +7,15 @@
  */
 
 import {
-	type Orientation,
-	getFocusableTreeWalker,
-	mergeRefs,
+	type Orientation
 } from "@kobalte/utils";
 import {
 	Show,
 	type ValidComponent,
-	createEffect,
-	createSignal,
-	on,
-	onCleanup,
 	splitProps,
+	createMemo
 } from "solid-js";
 
-import createPresence from "solid-presence";
 import {
 	type ElementOf,
 	Polymorphic,
@@ -41,14 +35,11 @@ export interface TabsContentOptions {
 }
 
 export interface TabsContentCommonProps<T extends HTMLElement = HTMLElement> {
-	id: string;
-	ref: T | ((el: T) => void);
 }
 
 export interface TabsContentRenderProps extends TabsContentCommonProps {
 	role: "tabpanel";
 	tabIndex: number | undefined;
-	"aria-labelledby": string | undefined;
 	"data-orientation": Orientation;
 	"data-selected": string | undefined;
 }
@@ -63,73 +54,18 @@ export type TabsContentProps<
 export function TabsContent<T extends ValidComponent = "div">(
 	props: PolymorphicProps<T, TabsContentProps<T>>,
 ) {
-	const [ref, setRef] = createSignal<HTMLElement>();
-
 	const context = useTabsContext();
-
 	const [local, others] = splitProps(props as TabsContentProps, [
-		"ref",
-		"id",
 		"value",
 		"forceMount",
 	]);
-
-	const [tabIndex, setTabIndex] = createSignal<number | undefined>(0);
-
-	const id = () => local.id ?? context.generateContentId(local.value);
-
-	const isSelected = () => context.listState().selectedKey() === local.value;
-
-	const { present } = createPresence({
-		show: () => local.forceMount || isSelected(),
-		element: () => ref() ?? null,
-	});
-
-	createEffect(
-		on([() => ref(), () => present()], ([ref, isPresent]) => {
-			if (ref == null || !isPresent) {
-				return;
-			}
-
-			const updateTabIndex = () => {
-				// Detect if there are any tabbable elements and update the tabIndex accordingly.
-				const walker = getFocusableTreeWalker(ref, { tabbable: true });
-				setTabIndex(walker.nextNode() ? undefined : 0);
-			};
-
-			updateTabIndex();
-
-			const observer = new MutationObserver(updateTabIndex);
-
-			// Update when new elements are inserted, or the tabindex/disabled attribute updates.
-			observer.observe(ref, {
-				subtree: true,
-				childList: true,
-				attributes: true,
-				attributeFilter: ["tabindex", "disabled"],
-			});
-
-			onCleanup(() => {
-				observer.disconnect();
-			});
-		}),
-	);
-
-	createEffect(
-		on([() => local.value, id], ([value, id]) => {
-			context.contentIdsMap().set(value, id);
-		}),
-	);
-
+	const isSelected = createMemo(() => context.listState().selectedKey() === local.value);
 	return (
-		<Show when={present()}>
+		<Show when={isSelected()}>
 			<Polymorphic<TabsContentRenderProps>
 				as="div"
-				ref={mergeRefs(setRef, local.ref)}
-				id={id()}
 				role="tabpanel"
-				tabIndex={tabIndex()}
-				aria-labelledby={context.triggerIdsMap().get(local.value)}
+				tabIndex={0}
 				data-orientation={context.orientation()}
 				data-selected={isSelected() ? "" : undefined}
 				{...others}

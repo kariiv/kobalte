@@ -13,13 +13,9 @@ export interface TabsContextValue {
 	isDisabled: Accessor<boolean>;
 	orientation: Accessor<Orientation>;
 	activationMode: Accessor<TabsActivationMode>;
-	triggerIdsMap: Accessor<Map<string, string>>;
-	contentIdsMap: Accessor<Map<string, string>>;
 	listState: Accessor<SingleSelectListState>;
 	selectedTab: Accessor<HTMLElement | undefined>;
 	setSelectedTab: Setter<HTMLElement | undefined>;
-	generateTriggerId: (value: string) => string;
-	generateContentId: (value: string) => string;
 }
 
 export const TabsContext = createContext<TabsContextValue>();

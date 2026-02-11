@@ -41,7 +41,6 @@ export interface TabsTriggerOptions {
 }
 
 export interface TabsTriggerCommonProps<T extends HTMLElement = HTMLElement> {
-	id: string;
 	ref: T | ((el: T) => void);
 	type: "button";
 	onPointerDown: JSX.EventHandlerUnion<T, PointerEvent>;
@@ -89,7 +88,6 @@ export function TabsTrigger<T extends ValidComponent = "button">(
 
 	const [local, others] = splitProps(mergedProps, [
 		"ref",
-		"id",
 		"value",
 		"disabled",
 		"onPointerDown",
@@ -100,14 +98,9 @@ export function TabsTrigger<T extends ValidComponent = "button">(
 		"onFocus",
 	]);
 
-	const id = () => local.id ?? context.generateTriggerId(local.value);
-
 	const isHighlighted = () =>
 		context.listState().selectionManager().focusedKey() === local.value;
-
 	const isDisabled = () => local.disabled || context.isDisabled();
-
-	const contentId = () => context.contentIdsMap().get(local.value);
 
 	createDomCollectionItem<CollectionItemWithRef>({
 		getItem: () => ({
@@ -135,17 +128,10 @@ export function TabsTrigger<T extends ValidComponent = "button">(
 		}
 	};
 
-	createEffect(
-		on([() => local.value, id], ([value, id]) => {
-			context.triggerIdsMap().set(value, id);
-		}),
-	);
-
 	return (
 		<Polymorphic<TabsTriggerRenderProps>
 			as="button"
 			ref={mergeRefs((el) => (ref = el), local.ref)}
-			id={id()}
 			role="tab"
 			tabIndex={!isDisabled() ? selectableItem.tabIndex() : undefined}
 			disabled={isDisabled()}

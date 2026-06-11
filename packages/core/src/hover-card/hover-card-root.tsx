@@ -68,6 +68,8 @@ export interface HoverCardRootOptions
 	 */
 	forceMount?: boolean;
 
+	triggerRef?: HTMLElement;
+
 	/**
 	 * A unique identifier for the component.
 	 * The id is used to generate id attributes for nested components.
@@ -107,7 +109,7 @@ export function HoverCardRoot(props: HoverCardRootProps) {
 	let openTimeoutId: number | undefined;
 	let closeTimeoutId: number | undefined;
 
-	const [triggerRef, setTriggerRef] = createSignal<HTMLElement>();
+	const [triggerRef, setTriggerRef] = createSignal<HTMLElement>(props.triggerRef);
 	const [contentRef, setContentRef] = createSignal<HTMLElement>();
 
 	const [currentPlacement, setCurrentPlacement] = createSignal<Placement>(
